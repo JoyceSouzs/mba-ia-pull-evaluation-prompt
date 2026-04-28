@@ -334,3 +334,120 @@ python src/evaluate.py
 - **Não altere os datasets de avaliação** - apenas os prompts em `prompts/bug_to_user_story_v2.yml`
 - **Itere, itere, itere** - é normal precisar de 3-5 iterações para atingir 0.9 em todas as métricas
 - **Documente seu processo** - a jornada de otimização é tão importante quanto o resultado final
+
+---
+
+## Técnicas Aplicadas (Fase 2)
+
+### 1. Few-shot Learning (obrigatório)
+
+**O que é:** Fornecer exemplos concretos de entrada/saída dentro do prompt para que o modelo aprenda o padrão esperado.
+
+**Por que escolhi:** O prompt v1 não tinha nenhum exemplo, o que fazia o modelo "adivinhar" o formato de saída. Com 3 exemplos (simples, médio e complexo), o modelo entende exatamente a estrutura esperada para cada nível de complexidade.
+
+**Como apliquei:** Incluí 3 exemplos completos no system_prompt:
+- **Exemplo simples** (imagens no Safari): User story curta + 5 critérios BDD
+- **Exemplo médio** (segurança de API): User story + critérios BDD + critérios adicionais + contexto de segurança
+- **Exemplo complexo** (relatórios gerenciais): User story completa com seções === CRITÉRIOS DE ACEITAÇÃO === (A/B/C/D), === CRITÉRIOS TÉCNICOS ===, === CONTEXTO DO BUG ===, === TASKS TÉCNICAS SUGERIDAS ===
+
+### 2. Role Prompting
+
+**O que é:** Definir uma persona/papel específico para o modelo, estabelecendo contexto de expertise.
+
+**Por que escolhi:** O prompt v1 usava "Você é um assistente" (genérico). Ao definir "Product Manager Senior com 10+ anos de experiência em metodologias ágeis", o modelo produz respostas mais profissionais, com tom adequado e foco em valor de negócio.
+
+**Como apliquei:** Defini a persona logo no início do system_prompt com expertise em Scrum, Kanban e BDD, estabelecendo autoridade e contexto para a tarefa.
+
+### 3. Chain of Thought (CoT)
+
+**O que é:** Instruir o modelo a seguir um processo de raciocínio passo a passo antes de gerar a resposta.
+
+**Por que escolhi:** A conversão de bug report para user story exige análise multi-etapa: classificar complexidade, identificar persona, formular user story, criar critérios. Sem CoT, o modelo pode pular etapas ou gerar respostas inconsistentes.
+
+**Como apliquei:** Defini 5 passos mentais explícitos:
+1. Classificar a complexidade do bug (simples/médio/complexo)
+2. Identificar a persona afetada
+3. Formular a User Story principal ("Como um... eu quero... para que...")
+4. Criar Critérios de Aceitação em formato BDD
+5. Adicionar seções extras conforme a complexidade
+
+---
+
+## Resultados Finais
+
+### Métricas de Avaliação
+
+| Métrica | v1 (antes) | v2 (depois) | Status |
+|---------|-----------|------------|--------|
+| Helpfulness | < 0.50 | >= 0.90 | TBD |
+| Correctness | < 0.55 | >= 0.90 | TBD |
+| F1-Score | < 0.50 | >= 0.90 | TBD |
+| Clarity | < 0.50 | >= 0.90 | TBD |
+| Precision | < 0.50 | >= 0.90 | TBD |
+
+> Atualize esta tabela com os resultados reais após executar `python src/evaluate.py`
+
+### LangSmith Dashboard
+
+> Adicione aqui o link público do seu dashboard do LangSmith e screenshots das avaliações.
+
+---
+
+## Como Executar
+
+### Pré-requisitos
+
+- Python 3.9+
+- Conta no [LangSmith](https://smith.langchain.com/) com API key
+- API key do Google (Gemini) ou OpenAI
+
+### 1. Configurar ambiente
+
+```bash
+# Clonar o repositório
+git clone <seu-fork-url>
+cd mba-ia-pull-evaluation-prompt
+
+# Criar e ativar ambiente virtual
+python3 -m venv venv
+source venv/bin/activate  # No Windows: venv\Scripts\activate
+
+# Instalar dependências
+pip install -r requirements.txt
+
+# Configurar variáveis de ambiente
+cp .env.example .env
+# Edite o .env com suas credenciais
+```
+
+### 2. Executar pull dos prompts
+
+```bash
+python src/pull_prompts.py
+```
+
+### 3. Executar testes de validação
+
+```bash
+pytest tests/test_prompts.py -v
+```
+
+### 4. Fazer push do prompt otimizado
+
+```bash
+python src/push_prompts.py
+```
+
+### 5. Executar avaliação
+
+```bash
+python src/evaluate.py
+```
+
+### 6. Iterar
+
+Se alguma métrica estiver abaixo de 0.9:
+1. Edite `prompts/bug_to_user_story_v2.yml`
+2. Execute `python src/push_prompts.py` novamente
+3. Execute `python src/evaluate.py` novamente
+4. Repita até todas as métricas >= 0.9
