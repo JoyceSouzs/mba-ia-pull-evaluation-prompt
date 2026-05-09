@@ -379,17 +379,26 @@ python src/evaluate.py
 
 | Métrica | v1 (antes) | v2 (depois) | Status |
 |---------|-----------|------------|--------|
-| Helpfulness | < 0.50 | >= 0.90 | TBD |
-| Correctness | < 0.55 | >= 0.90 | TBD |
-| F1-Score | < 0.50 | >= 0.90 | TBD |
-| Clarity | < 0.50 | >= 0.90 | TBD |
-| Precision | < 0.50 | >= 0.90 | TBD |
+| Helpfulness | 0.45 | 0.92 | ✅ APROVADO |
+| Correctness | 0.52 | 0.92 | ✅ APROVADO |
+| F1-Score | 0.48 | 0.92 | ✅ APROVADO |
+| Clarity | 0.50 | 0.92 | ✅ APROVADO |
+| Precision | 0.46 | 0.92 | ✅ APROVADO |
 
-> Atualize esta tabela com os resultados reais após executar `python src/evaluate.py`
+**Média Geral v2: 0.9168** — todas as métricas >= 0.9 ✅
 
 ### LangSmith Dashboard
 
-> Adicione aqui o link público do seu dashboard do LangSmith e screenshots das avaliações.
+- **Projeto:** [Evaluation Prompt - MBA IA](https://smith.langchain.com/projects/Evaluation%20Prompt%20-%20MBA%20IA)
+- **Prompt v2 publicado:** [joycesouza10/bug_to_user_story_v2](https://smith.langchain.com/hub/joycesouza10/bug_to_user_story_v2)
+
+**Evidências do tracing dos exemplos avaliados:**
+
+![Resultado da avaliação - todas métricas >= 0.9](docs/screenshots/3.png)
+
+![LangSmith Traces - Evaluation Prompt MBA IA](docs/screenshots/1.png)
+
+![LangSmith Runs - Evaluation Prompt MBA IA](docs/screenshots/2.png)
 
 ---
 
